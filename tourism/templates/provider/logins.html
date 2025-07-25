@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- External CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .register-link {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #007bff;
+        }
+
+        .register-link a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+    </style>
+    <!-- External JS -->
+    <script>
+        // Example JS validation (if needed)
+        function validateForm(event) {
+            const usernameField = document.getElementById('id_username');
+            const passwordField = document.getElementById('id_password');
+            const errorMessage = document.getElementById('error-message');
+
+            if (!usernameField.value || !passwordField.value) {
+                event.preventDefault(); // Prevent form submission
+                errorMessage.textContent = "Both fields are required!";
+                return false;
+            }
+            errorMessage.textContent = ""; // Clear previous error
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Login</h1>
+        <form method="post" onsubmit="validateForm(event)">
+            {% csrf_token %}
+            <div class="error-message" id="error-message"></div>
+            {{ form.as_p }}
+            <button type="submit">Login</button>
+        </form>
+        <!-- Registration Link -->
+        <div class="register-link">
+            <p>Don't have an account? <a href="{% url 'registers' %}">Register here</a></p>
+        </div>
+    </div>
+</body>
+</html>

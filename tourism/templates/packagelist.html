@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Packages</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-image: url("{% static 'img/package.webp' %}"); /* replace with your image URL */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            backdrop-filter: brightness(0.9); /* optional: darkens background slightly */
+        }
+        
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: #fff;
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Increased image size */
+        img {
+            max-width: 200px;  /* Increased max-width */
+            max-height: 200px; /* Increased max-height */
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid #ccc;
+        }
+
+        .package-details {
+            display: flex;
+            flex-direction: column;
+            max-width: calc(100% - 240px); /* Adjusting for the larger image */
+        }
+
+        .package-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .package-price, .package-duration {
+            font-size: 16px;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        .package-description {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .remove-button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .remove-button:hover {
+            background-color: #e60000;
+        }
+
+        .no-image {
+            background-color: #f0f0f0;
+            color: #888;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px; /* Increased height for placeholder */
+            width: 200px;  /* Increased width for placeholder */
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        /* Center the content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .remove-button {
+            width: 100%;
+        }
+
+        /* Style for the logout button */
+        .logout-btn {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Tour Packages</h1>
+        <ul class="list-group">
+            {% for package in packages %}
+                {% if package.verified and package.availability > 0 %}
+                    <li class="list-group-item d-flex align-items-center">
+                        <div class="package-image">
+                            {% if package.image %}
+                                <img src="{{ package.image.url }}" alt="{{ package.title }}">
+                            {% else %}
+                                <div class="no-image">No Image Available</div>
+                            {% endif %}
+                        </div>
+                        <div class="package-details">
+                            <div class="package-title">{{ package.title }}</div>
+                            <div class="package-price">Price: ₹{{ package.price }}</div>
+                            {% if package.duration %}
+                                <div class="package-duration">Duration: {{ package.duration }}</div>
+                            {% endif %}
+                            <div class="package-description">{{ package.description }}</div>
+                            <a href="{% url 'book_packages' package_id=package.id %}" class="btn btn-primary mt-3">Book Now</a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="list-group-item d-flex align-items-center">
+                        <div class="no-image">This package is either not verified or unavailable.</div>
+                    </li>
+                {% endif %}
+            {% empty %}
+                <p>No packages available.</p>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

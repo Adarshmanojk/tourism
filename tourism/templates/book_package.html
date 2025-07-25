@@ -1,0 +1,103 @@
+{% extends 'index.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1 class="heading">Book Your Tour Package: {{ package.title }}</h1>
+
+    <div class="package-details">
+      <div class="image-container">
+        <img src="{{ package.image.url }}" alt="{{ package.title }}" class="package-image">
+      </div>
+      <div class="package-info">
+        <p><strong>Description:</strong> {{ package.description }}</p>
+        <p><strong>Price:</strong> ${{ package.price }}</p>
+        <p><strong>Availability:</strong> {{ package.availability }} slots left</p>
+        <p><strong>Duration:</strong> {{ package.duration }}</p>
+      </div>
+    </div>
+
+    <div class="booking-form">
+      <form method="POST">
+        {% csrf_token %}
+        <a href="{% url 'book_packages' package_id=package.id %}">
+          <button type="submit" class="btn btn-primary" id="bookButton">Book Now</button>
+        </a>
+        {% comment %} <button type="submit" class="btn btn-primary" id="bookButton">Book Now</button> {% endcomment %}
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Simple JS for confirmation before booking
+    document.getElementById('bookButton').addEventListener('click', function(event) {
+      if (!confirm('Are you sure you want to book this package?')) {
+        event.preventDefault();
+      }
+    });
+  </script>
+
+{% endblock %}
+
+{% block extra_css %}
+  <style>
+    /* Custom CSS for styling */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .heading {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 30px;
+      color: #007bff;
+    }
+
+    .package-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    .image-container {
+      flex-basis: 40%;
+    }
+
+    .package-image {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .package-info {
+      flex-basis: 55%;
+      font-size: 1.1rem;
+    }
+
+    .package-info p {
+      margin-bottom: 10px;
+    }
+
+    .booking-form {
+      text-align: center;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+  </style>
+{% endblock %}
+

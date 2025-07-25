@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Tour Packages</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-image: url("{% static 'img/package.webp' %}"); /* replace with your image URL */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        backdrop-filter: brightness(0.9); /* optional: darkens background slightly */
+    }
+    
+
+    
+
+    h1 {
+      text-align: center;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 40px;
+    }
+
+    .list-group-item {
+      background: #fff;
+      border: none;
+      border-radius: 15px !important;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      margin-bottom: 25px;
+      padding: 20px;
+      transition: transform 0.2s;
+    }
+
+    .list-group-item:hover {
+      transform: scale(1.02);
+    }
+
+    .package-image img {
+      max-width: 180px;
+      max-height: 180px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      object-fit: cover;
+    }
+
+    .package-details {
+      flex: 1;
+      padding-left: 20px;
+    }
+
+    .package-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .package-price,
+    .package-duration {
+      font-size: 16px;
+      color: #555;
+      margin-top: 5px;
+    }
+
+    .package-description {
+      font-size: 14px;
+      color: #666;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    .action-buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-edit,
+    .btn-remove {
+      border-radius: 20px;
+      font-size: 14px;
+      padding: 8px 16px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .btn-edit {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-edit:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-remove {
+      background-color: #ff4d4d;
+      color: white;
+    }
+
+    .btn-remove:hover {
+      background-color: #d93636;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    .btn-logout,
+    .btn-add {
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .btn-logout {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .btn-logout:hover {
+      background-color: #d32f2f;
+    }
+
+    .btn-add {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn-add:hover {
+      background-color: #388e3c;
+    }
+
+    @media (max-width: 768px) {
+      .package-image img {
+        max-width: 120px;
+        max-height: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="container">
+      <div class="top-actions">
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-logout">Logout</button>
+        </form>
+        <a href="{% url 'add_package' %}" class="btn btn-add">Add Package</a>
+      </div>
+
+      <h1>Your Tour Packages</h1>
+
+      <ul class="list-group">
+        {% for package in packages %}
+          <li class="list-group-item d-flex flex-wrap align-items-start">
+            <div class="package-image">
+              {% if package.image %}
+                <img src="{{ package.image.url }}" alt="{{ package.title }}">
+              {% else %}
+                <img src="{% static 'img/no-image.png' %}" alt="No Image">
+              {% endif %}
+            </div>
+            <div class="package-details">
+              <div class="package-title">{{ package.title }}</div>
+              <div class="package-price">Price: ₹{{ package.price }}</div>
+              {% if package.duration %}
+                <div class="package-duration">Duration: {{ package.duration }}</div>
+              {% endif %}
+              <div class="package-description">{{ package.description }}</div>
+              <div class="action-buttons">
+                <form action="{% url 'edit_package' package.id %}" method="GET">
+                  <button type="submit" class="btn btn-edit">Edit</button>
+                </form>
+                <form action="{% url 'remove_package' package.id %}" method="POST">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-remove">Remove</button>
+                </form>
+              </div>
+            </div>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-center">You haven't added any tour packages yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+
+
+
+

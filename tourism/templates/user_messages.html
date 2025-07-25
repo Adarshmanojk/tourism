@@ -1,0 +1,38 @@
+{% extends 'index.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Your Messages</h2>
+
+  {% if messages %}
+    <div class="list-group">
+      {% for msg in messages %}
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-1">{{ msg.created_at|date:"d M Y, H:i" }}</h5>
+            <form method="POST" action="{% url 'delete_message' msg.id %}" onsubmit="return confirm('Are you sure you want to delete this message?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+          </div>
+
+          <p class="mt-2"><strong>You:</strong> {{ msg.message }}</p>
+
+          {% if msg.reply %}
+            <div class="alert alert-info mt-2">
+              <strong>Admin replied:</strong> {{ msg.reply }} <br>
+              <small class="text-muted">{{ msg.replied_at|date:"d M Y, H:i" }}</small>
+            </div>
+          {% else %}
+            <p class="text-muted">Awaiting reply...</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-center text-muted">No messages found.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+
+

@@ -1,0 +1,74 @@
+{% extends "index.html" %}
+{% load static %}
+{% block content %}
+<!-- Google Font for Clean UI -->
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    background-image: url("{% static 'img/fly.webp' %}");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .content-panel {
+    background-color: rgba(255, 255, 255, 0.35); /* Glass effect background */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+  }
+
+  h4 {
+    font-weight: bold;
+    color: #333;
+  }
+
+  table {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  th, td {
+    vertical-align: middle !important;
+  }
+</style>
+
+<div class="container mt-5 content-panel">
+  <h4>🛫 Latest Flight Bookings</h4>
+  <table class="table table-bordered table-striped mt-3">
+    <thead class="table-dark">
+      <tr>
+        <th>User</th>
+        <th>Flight Number</th>
+        <th>Total Price</th>
+        <th>Seats</th>
+        <th>Seat Class</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in latest_flight_bookings %}
+        <tr>
+          <td>{{ b.username_id.username }}</td>
+          <td>{{ b.flight }}</td>
+          <td>₹{{ b.total_price }}</td>
+          <td>{{ b.seat }}</td>
+          <td>{{ b.seat_class }}</td>
+          <td>{{ b.status }}</td>
+          <td>{{ b.date }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="text-center">No flight bookings found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+

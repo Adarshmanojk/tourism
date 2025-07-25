@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f9;
+        }
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .navbar a:hover {
+            background-color: #4CAF50;
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        .logout-btn {
+            background: red;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        .logout-btn:hover {
+            background: darkred;
+        }
+        .main-content {
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="nav-links">
+            
+            <a href=""></a>
+            <a href="{% url 'admin_messages_list' %}">MESSAGES</a>
+            <a href="{% url 'charity_report' %}">Manage Charity Reports</a>
+            <a href="{% url 'viewfeedback' %}">View Feedback</a>
+            <a href="{% url 'admin_complaints' %}">View Complaints</a>
+            <a href=""></a>
+        </div>
+        <a href="{% url 'admin_logout' %}" class="logout-btn">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Welcome, Admin</h1>
+        <p>Manage the donation platform efficiently.</p>
+    </div>
+</body>
+</html>

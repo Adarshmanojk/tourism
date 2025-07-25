@@ -1,0 +1,23 @@
+{% extends "index.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Reply to Message</h2>
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <p><strong>From:</strong> {{ message.name }} ({{ message.email }})</p>
+            <p><strong>Message:</strong> {{ message.message }}</p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="reply">Your Reply</label>
+                    <textarea name="reply" id="reply" rows="4" class="form-control" required>{{ message.reply }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-success mt-3">Send Reply</button>
+                <a href="{% url 'admin_messages_list' %}" class="btn btn-secondary mt-3 ml-2">Back</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

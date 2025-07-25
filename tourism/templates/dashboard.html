@@ -1,0 +1,254 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Dashboard</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url("{% static 'img/tour3.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+      padding-top: 60px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      font-size: 32px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    th, td {
+      padding: 14px;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background: #2196f3;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+      transition: 0.3s;
+    }
+
+    .btn-custom {
+      background-color: #2196f3;
+      color: white;
+      border-radius: 25px;
+      padding: 10px 20px;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: 0.3s ease;
+      margin: 10px;
+    }
+
+    .btn-custom:hover {
+      background-color: #1976d2;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .section {
+      margin: 40px 0;
+      padding: 30px;
+      border-radius: 15px;
+    }
+
+    .flights-d {
+      background: linear-gradient(to right, #bbdefb, #e3f2fd);
+    }
+
+    .hotels-d {
+      background: linear-gradient(to right, #fce4ec, #f8bbd0);
+    }
+
+    .package-d {
+      background: linear-gradient(to right, #c8e6c9, #e8f5e9);
+    }
+
+    .nav-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+
+    .logout-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .logout-btn form {
+      display: inline;
+    }
+
+    .logout-btn button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: 500;
+      text-transform: uppercase;
+      transition: 0.3s ease;
+    }
+
+    .logout-btn button:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Home Button -->
+  <a href="{% url 'home' %}" class="btn btn-custom nav-btn">🏠 Home</a>
+
+  <!-- Logout Button -->
+  <div class="logout-btn">
+    <form method="POST" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit">🚪 Logout</button>
+    </form>
+  </div>
+
+  <div class="container">
+    <a href="{% url 'user_messages' %}" class="btn btn-custom">📬 My Messages</a>
+
+    <!-- Flight Bookings Section -->
+    <div class="section flights-d">
+      <h2>✈️ Flight Bookings</h2>
+      <table>
+        <tr>
+          <th>Flight Number</th>
+          <th>Date</th>
+          <th>Seats</th>
+          <th>Seat Class</th>
+          <th>Cancel</th>
+        </tr>
+        {% for i in flights %}
+        <tr>
+          <td>{{ i.flight }}</td>
+          <td>{{ i.date }}</td>
+          <td>{{ i.seat }}</td>
+          <td>{{ i.seat_class }}</td>
+          <td>
+            <a class="btn btn-custom" href="{% url 'cancel_flight' i.flight i.date|date:'Y-m-d' i.seat i.seat_class %}">
+                Cancel
+            </a>
+        </td>
+        
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No flight bookings found.</td></tr>
+        {% endfor %}
+      </table>
+      <a href="{% url 'flights' %}" class="btn btn-custom">Book a Flight</a>
+    </div>
+
+    <!-- Hotel Bookings Section -->
+    <div class="section hotels-d">
+      <h2>🏨 Hotel Bookings</h2>
+      <table>
+        <tr>
+          <th>Hotel Name</th>
+          <th>Date</th>
+          <th>Rooms</th>
+          <th>Cancel</th>
+        </tr>
+        {% for j in hotels %}
+        <tr>
+          <td>{{ j.hotel_name }}</td>
+          <td>{{ j.date }}</td>
+          <td>{{ j.room }}</td>
+          <td><a class="btn btn-custom" href="/cancelhotel/{{ j.hotel_name }}/{{ j.date }}/{{ j.room }}">Cancel</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No hotel bookings found.</td></tr>
+        {% endfor %}
+      </table>
+      <a href="{% url 'hotels' %}" class="btn btn-custom">Book a Hotel</a>
+    </div>
+
+    <!-- Package Bookings Section -->
+    <div class="section package-d">
+      <h2>🎒 Package Bookings</h2>
+      <table>
+        <tr>
+          <th>Flight Number</th>
+          <th>Seats</th>
+          <th>Seat Class</th>
+          <th>Hotel Name</th>
+          <th>Rooms</th>
+          <th>Date</th>
+          <th>Cancel</th>
+        </tr>
+        {% for k in packages %}
+        <tr>
+          <td>{{ k.flight }}</td>
+          <td>{{ k.seat }}</td>
+          <td>{{ k.seat_class }}</td>
+          <td>{{ k.hotel_name }}</td>
+          <td>{{ k.room }}</td>
+          <td>{{ k.date }}</td>
+          {%if k.flight and k.seat and k.hotel_name and k.date and k.room %}
+          {% comment %} <td><a class="btn btn-custom" href="/cancelpackage/{{ k.flight }}/{{ k.seat }}/{{ k.hotel_name }}/{{ k.date }}/{{ k.room }}">Cancel</a></td> {% endcomment %}
+          <td>
+            <a class="btn btn-custom" href="{% url 'cancel_package' k.id %}">Cancel</a>
+        </td>
+          {% else %}
+              <td>Invalid Package</td>
+          {% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No package bookings found.</td></tr>
+        {% endfor %}
+      </table>
+      <a href="{% url 'package' %}" class="btn btn-custom">Book a Package</a>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $(".btn-custom").on("click", function() {
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+      });
+    });
+  </script>
+</body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <title>Flight Booking</title>
+
+    <!-- Bootstrap & Fonts -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Spicy+Rice&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/flight.css' %}">
+
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-image: url('{% static "img/flight.jpg" %}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            font-family: 'Fredoka One', cursive;
+            color: #fff;
+        }
+
+        .title {
+            font-family: 'Spicy Rice', cursive;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 3rem;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            margin: auto;
+            color: #000;
+        }
+
+        .ticket-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .ticket {
+            flex: 1 1 800px;
+            max-width: 900px;
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            color: #000;
+            margin-bottom: 25px;
+        }
+
+        .ticket h3 {
+            font-family: 'Fredoka One', cursive;
+            color: #0066cc;
+            flex: 1;
+            text-align: left;
+            font-size: 1.8rem;
+        }
+
+        .ticket-details {
+            flex: 2;
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        .bill-container {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 40px auto;
+            color: #000;
+            display: none;
+            text-align: center;
+        }
+
+        .bill-container h2 {
+            font-family: 'Spicy Rice', cursive;
+            color: #28a745;
+        }
+
+        .bill-container button {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+{% block content %}
+<div class="container mt-5">
+    <h1 class="title">SEARCH FLIGHTS</h1>
+
+    <div class="form-container shadow-lg mb-5">
+        <form action="" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-primary btn-block">SEARCH</button>
+        </form>
+    </div>
+
+    {% if flight %}
+        <div class="ticket-container">
+            {% with i=flight %}
+                <div class="ticket shadow-lg">
+                    <h3>{{ i.company }} - <span class="text-primary">{{ i.flight_num }}</span></h3>
+                    <div class="ticket-details">
+                        <p><strong>Economy Availability:</strong> {{ seatrem_economy }}</p>
+                        <p><strong>Business Availability:</strong> {{ seatrem_business }}</p>
+                        <p><strong>FROM:</strong> {{ i.source }} &nbsp; | &nbsp; <strong>TO:</strong> {{ i.destination }}</p>
+                        <p><strong>DEPT TIME:</strong> {{ i.dept_time }} &nbsp; | &nbsp; <strong>DEST TIME:</strong> {{ i.dest_time }}</p>
+                        <p><strong>Economy Price:</strong> ₹{{ i.eprice }}</p>
+                        <p><strong>Business Price:</strong> ₹{{ i.bprice }}</p>
+                        <div class="text-center mt-3">
+                            {% if seat_class == "economy" %}
+                                <button class="btn btn-success pay-button"
+                                        data-order="{{ razorpay_order_id }}"
+                                        data-key="{{ razorpay_key }}"
+                                        data-amount="{{ i.eprice }}"
+                                        data-flight="{{ i.flight_num }}"
+                                        data-date="{{ date }}"
+                                        data-seats="{{ seatsreq }}"
+                                        data-seat_class="economy">
+                                    Pay & Book Economy
+                                </button>
+                            {% elif seat_class == "business" %}
+                                <button class="btn btn-warning pay-button"
+                                        data-order="{{ razorpay_order_id }}"
+                                        data-key="{{ razorpay_key }}"
+                                        data-amount="{{ i.bprice }}"
+                                        data-flight="{{ i.flight_num }}"
+                                        data-date="{{ date }}"
+                                        data-seats="{{ seatsreq }}"
+                                        data-seat_class="business">
+                                    Pay & Book Business
+                                </button>
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+                </div>
+            {% endwith %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Payment Bill Section -->
+<div class="bill-container shadow-lg" id="paymentBill">
+    <h2>🧾 Payment Bill</h2>
+    <p><strong>Flight Number:</strong> <span id="billFlight"></span></p>
+    <p><strong>Date:</strong> <span id="billDate"></span></p>
+    <p><strong>Seats:</strong> <span id="billSeats"></span></p>
+    <p><strong>Class:</strong> <span id="billClass"></span></p>
+    {% comment %} <p><strong>Total Amount:</strong> ₹{{ total_price }}</p> {% endcomment %}
+    <p><strong>Total Amount:</strong> ₹<span id="billAmount"></span></p>
+    <p><strong>Payment ID:</strong> <span id="billPaymentId"></span></p>
+    <p class="text-success"><strong>Status:</strong> Payment Successful ✅</p>
+    <button class="btn btn-primary" onclick="redirectToDashboard()">OK</button>
+</div>
+
+<script>
+    document.querySelectorAll('.pay-button').forEach(button => {
+        button.addEventListener("click", function(e) {
+            e.preventDefault();
+
+            var flightNum = this.dataset.flight;
+            var date = this.dataset.date;
+            var seats = this.dataset.seats;
+            var pricePerSeat = parseInt(this.dataset.amount); // Amount is per seat
+            
+            var seatClass = this.dataset.seat_class;
+
+            // ✅ Calculate total price correctly
+            var amount = seats * pricePerSeat;
+
+            var options = {
+                "key": this.dataset.key,
+                "amount": amount * 100,
+                "currency": "INR",
+                "name": "Flight Booking",
+                "description": "Payment for Flight " + flightNum + " (" + seatClass + ")",
+                "order_id": this.dataset.order,
+                "handler": function (response) {
+                    // Hide search and results
+                    document.querySelector(".form-container").style.display = "none";
+                    const ticketSection = document.querySelector(".ticket-container");
+                    if (ticketSection) ticketSection.style.display = "none";
+
+                    // Display Bill Section
+                    document.getElementById("billFlight").innerText = flightNum;
+                    document.getElementById("billDate").innerText = date;
+                    document.getElementById("billSeats").innerText = seats;
+                    document.getElementById("billClass").innerText = seatClass;
+                    document.getElementById("billAmount").innerText = amount;
+                    document.getElementById("billPaymentId").innerText = response.razorpay_payment_id;
+                    document.getElementById("paymentBill").style.display = "block";
+
+                    // Send booking details to Django backend
+                    fetch("/payment-successs/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        },
+                        body: new URLSearchParams({
+                            "razorpay_payment_id": response.razorpay_payment_id,
+                            "razorpay_order_id": response.razorpay_order_id,
+                            "razorpay_signature": response.razorpay_signature,
+                            "flight_num": flightNum,
+                            "date": date,
+                            "seats": seats,
+                            "seat_class": seatClass
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status !== "success") {
+                            alert("❌ Payment Failed: " + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("❌ Payment processing failed. Try again.");
+                    });
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+
+            var rzp = new Razorpay(options);
+            rzp.open();
+        });
+    });
+
+    function redirectToDashboard() {
+        window.location.href = "/dashboard/";  // 🔁 Replace with actual dashboard path
+    }
+</script>
+{% endblock %}
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Django Administration{% endblock %}
+
+{% block branding %}
+    <h1 id="site-name">
+        <a href="{% url 'admin:index' %}">Django Administration</a>
+    </h1>
+{% endblock %}
+
+{% block nav-global %}
+    <ul id="user-tools">
+        <li>WELCOME, {{ user.get_username|upper }}</li>
+        <li><a href="{% url 'admin:logout' %}">LOG OUT</a></li>
+    </ul>
+{% endblock %}

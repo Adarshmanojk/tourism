@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <title>Hotel Booking</title>
+    
+    <!-- Bootstrap and Fonts -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Spicy+Rice&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Fredoka+One&display=swap" rel="stylesheet">
+
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Custom Style -->
+    <style>
+        body {
+            background-image: url('{% static "img/hotel.jpg" %}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            color: #000;
+        }
+
+        .tr {
+            font-family: 'Spicy Rice', cursive;
+            text-align: center;
+            color: #fff;
+            font-size: 3rem;
+            margin-bottom: 30px;
+        }
+
+        .form-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+        }
+
+        .hotel {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            color: #000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .h-name {
+            font-family: 'Fredoka One', cursive;
+            font-size: 24px;
+            color: #0066cc;
+        }
+
+        .h-add, .h-am {
+            font-size: 16px;
+        }
+
+        .h-price {
+            font-size: 22px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .h-pricex {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .h-rate {
+            font-size: 20px;
+            color: orange;
+        }
+
+        .h-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .roomrem {
+            font-weight: bold;
+            color: green;
+        }
+
+        .btn-success {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Payment Bill Styles */
+        .bill-container {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 40px auto;
+            color: #000;
+            display: none;
+            text-align: center;
+        }
+
+        .bill-container h2 {
+            font-family: 'Spicy Rice', cursive;
+            color: #28a745;
+        }
+
+        .bill-container button {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+{% block content %}
+<div class="container mt-5" id="mainContainer">
+    <h1 class="tr">Search Hotels</h1>
+
+    <!-- Search Form -->
+    <div class="row justify-content-center" id="searchForm">
+        <div class="col-md-6 shadow-lg p-4 mb-5 form-box">
+            <form class="form-group" action="" method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary">SEARCH</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hotel Results -->
+    {% if hotel %}
+        {% for i in hotel %}
+            <div class="container mt-4 hotel-container">
+                {% if availability == "available" %}
+                    <div class="hotel shadow-lg p-3 mb-5">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <img class="h-img shadow-lg" src="/media/{{ i.image1 }}" alt="Hotel Image">
+                            </div>
+                            <div class="col-md-8">
+                                <p class="roomrem">Available Rooms: {{ roomrem }}</p>
+                                <p class="h-name">{{ i.hotel_name }}</p>
+                                <p class="h-add">{{ i.hotel_address }}.<br>{{ i.distfromap }} KM from the nearest airport.</p>
+                                <p class="h-price">₹{{ price }} <span class="h-pricex">/night</span></p>
+                                <p class="h-am">Amenities: {{ i.amenities }}</p>
+                                <div class="h-rate">
+                                    {% with ''|center:i.hotel_rating as range %}
+                                        {% for _ in range %} ★ {% endfor %}
+                                    {% endwith %}
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-success pay-button" 
+                                            data-order="{{ razorpay_order_id }}" 
+                                            data-key="{{ razorpay_key }}" 
+                                            data-amount="{{ price }}" 
+                                            data-hotel="{{ i.hotel_name }}" 
+                                            data-date="{{ date }}" 
+                                            data-rooms="{{ roomsreq }}">
+                                        Pay & Book Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center">
+                        <h4 class="text-danger">BOOKED</h4>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- Payment Bill Section -->
+<div class="bill-container shadow-lg" id="paymentBill">
+    <h2>🧾 Payment Bill</h2>
+    <p><strong>Hotel:</strong> <span id="billHotel"></span></p>
+    <p><strong>Date:</strong> <span id="billDate"></span></p>
+    <p><strong>Rooms:</strong> <span id="billRooms"></span></p>
+    <p><strong>Total Amount:</strong> ₹<span id="billAmount"></span></p>
+    <p><strong>Payment ID:</strong> <span id="billPaymentId"></span></p>
+    <p class="text-success"><strong>Status:</strong> Payment Successful ✅</p>
+    <button class="btn btn-primary" onclick="redirectToDashboard()">OK</button>
+</div>
+
+
+<script>
+    document.querySelectorAll('.pay-button').forEach(button => {
+        button.addEventListener("click", function(e) {
+            e.preventDefault();
+
+            var hotelName = this.dataset.hotel;
+            var date = this.dataset.date;
+            var rooms = this.dataset.rooms || "1";
+            var amount = this.dataset.amount;
+
+            var options = {
+                "key": this.dataset.key,
+                "amount": amount * 100,
+                "currency": "INR",
+                "name": "Hotel Booking",
+                "description": "Payment for Hotel " + hotelName,
+                "order_id": this.dataset.order,
+                "handler": function (response) {
+                    // Fill Bill
+                    document.getElementById("billHotel").innerText = hotelName;
+                    document.getElementById("billDate").innerText = date;
+                    document.getElementById("billRooms").innerText = rooms;
+                    document.getElementById("billAmount").innerText = amount;
+                    document.getElementById("billPaymentId").innerText = response.razorpay_payment_id;
+
+                    // Hide Main Page and Show Bill
+                    document.getElementById("mainContainer").style.display = "none";
+                    document.getElementById("paymentBill").style.display = "block";
+
+                    // Send to server
+                    fetch("/payment-succes/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        },
+                        body: new URLSearchParams({
+                            "razorpay_payment_id": response.razorpay_payment_id,
+                            "razorpay_order_id": response.razorpay_order_id,
+                            "razorpay_signature": response.razorpay_signature,
+                            "hotel_name": hotelName,
+                            "date": date,
+                            "rooms": rooms
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status !== "success") {
+                            alert("❌ Payment Failed: " + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert("❌ Payment processing failed! Please try again.");
+                    });
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp = new Razorpay(options);
+            rzp.open();
+        });
+    });
+
+    function redirectToDashboard() {
+        window.location.href = "/dashboard/";
+    }
+</script>
+{% endblock %}
+</body>
+</html>
+
+
+
+
+
+
+
+

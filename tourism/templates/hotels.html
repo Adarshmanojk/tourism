@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <title>Search Hotels</title>
+
+  <!-- Bootstrap & Google Fonts -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Spicy+Rice&display=swap" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <style>
+    body {
+      background-image: url('{% static "img/hotel.jpg" %}');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      font-family: 'Fredoka One', cursive;
+      color: #fff;
+    }
+
+    .t {
+      font-family: 'Spicy Rice', cursive;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 3rem;
+    }
+
+    .form {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+    }
+
+    .hotel {
+      margin-bottom: 40px;
+    }
+
+    /* Updated .ht class for all interaction states */
+    .ht, .ht:hover, .ht:focus, .ht:active, .ht:visited {
+      text-decoration: none !important;
+      color: inherit !important;
+    }
+
+    .h-img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .h-name {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .h-add,
+    .h-price,
+    .h-pricex,
+    .h-am {
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .h-price {
+      font-weight: bold;
+      font-size: 1.4rem;
+      color: #28a745;
+    }
+
+    .h-rate {
+      font-size: 1.2rem;
+      color: #f1c40f;
+    }
+
+    .fff {
+      background-color: #007bff;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 1.2rem;
+      margin: 10px auto;
+      width: fit-content;
+    }
+
+    .shadow-lg {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    button.btn-primary {
+      font-size: 1.1rem;
+      padding: 8px 20px;
+    }
+  </style>
+</head>
+
+<body>
+{% block content %}
+<div class="container mt-5">
+  <h1 class="t">SEARCH HOTELS</h1>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <form class="form shadow-lg" action="" method="POST" id="hotelForm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="text-center">
+          <button class="btn btn-primary">SEARCH</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="main mt-5">
+    {% for i in Hotels %}
+    <div class="hotel">
+      <a class="ht" href="{% if user.is_authenticated %}/bookhotel/{{ i.hotel_name }}/{{ date }}{% else %}{% url 'login_url' %}?next=/bookhotel/{{ i.hotel_name }}/{{ date }}{% endif %}">
+        <div class="row shadow-lg p-3 rounded bg-white">
+          <div class="col-md-4">
+            <img class="h-img" src="/media/{{ i.image1 }}" alt="{{ i.hotel_name }}">
+          </div>
+          <div class="col-md-8">
+            <p class="h-name">{{ i.hotel_name }}</p>
+            <p class="h-add">{{ i.hotel_address }}<br>{{ i.distfromap }} KM from nearest airport.</p>
+            <p class="h-price">₹{{ i.hotel_price }}<span class="h-pricex"> /night</span></p>
+            <p class="h-am"><strong>Amenities:</strong> {{ i.amenities }}</p>
+            <div class="h-rate">
+              {% with ''|center:i.hotel_rating as range %}
+                {% for _ in range %}
+                    ★
+                {% endfor %}
+              {% endwith %}
+            </div>
+          </div>
+        </div>
+        <div class="fff">BOOK</div>
+      </a>
+    </div>
+    {% empty %}
+    <div class="text-center text-white">
+      {% comment %} <h4>No Hotels Found</h4> {% endcomment %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+<!-- JS: Date Validation -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var dateField = document.querySelector("input[name='date']");
+    if (dateField) {
+      var today = new Date().toISOString().split('T')[0];
+      dateField.setAttribute("min", today);
+
+      document.getElementById("hotelForm").addEventListener("submit", function (event) {
+        var selectedDate = new Date(dateField.value);
+        var currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+
+        if (selectedDate < currentDate) {
+          alert("Date cannot be in the past. Please select a valid date.");
+          event.preventDefault();
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
+

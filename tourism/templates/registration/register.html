@@ -1,0 +1,96 @@
+{% extends 'index.html' %}
+{% block content %}
+<div class="v">
+  <div class="container"><br><br>
+    <h1 class="ht"> CREATE NEW ACCOUNT</h1><br><br>
+    <div class="row">
+      <div class="col-md-3"></div>
+      <div class="form col-md-6 p-4 shadow-lg bg-light rounded">
+        <form class="form-group" method="POST">
+          {% csrf_token %}
+          
+          <!-- Display form errors -->
+          {% if form.errors %}
+            <div class="alert alert-danger">
+              <ul>
+                {% for field, errors in form.errors.items %}
+                  {% for error in errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label"><strong>Username:</strong></label>
+            {{ form.username }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"><strong>First Name:</strong></label>
+            {{ form.first_name }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"><strong>Last Name:</strong></label>
+            {{ form.last_name }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"><strong>Email:</strong></label>
+            {{ form.email }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"><strong>Password:</strong></label>
+            {{ form.password1 }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"><strong>Confirm Password:</strong></label>
+            {{ form.password2 }}
+          </div>
+
+          <button class="btn btn-primary w-100">REGISTER</button>
+        </form>
+      </div>
+      <div class="col-md-3"></div>
+    </div>
+  </div>
+  <br><br><br>
+</div>
+
+<style>
+  .btn {
+    display: block;
+    margin: 0 auto;
+  }
+  .ht {
+    font-family: 'Viga';
+    text-align: center;
+    color: white; /* Improve visibility on the background */
+    font-weight: bold;
+  }
+  .v {
+    background: url('/static/img/tour.jpg') no-repeat center center/cover; /* Add Background Image */
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .form {
+    background: rgba(255, 255, 255, 0.9); /* Semi-transparent form background */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  .alert {
+    color: red;
+    font-size: 14px;
+  }
+</style>
+
+
+{% endblock %}

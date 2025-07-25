@@ -1,0 +1,155 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title>Cancel Package Booking</title>
+    
+    <!-- Bootstrap & Google Fonts -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Spicy+Rice&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-image: url('{% static "img/tour3.jpg" %}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            font-family: 'Fredoka One', cursive;
+            color: #fff;
+        }
+
+        .title {
+            font-family: 'Spicy Rice', cursive;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 3rem;
+        }
+
+        .cancel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .ticket {
+            width: 90%;
+            max-width: 700px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            color: #000;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .ticket h3 {
+            color: #0066cc;
+            font-size: 2rem;
+        }
+
+        .ticket-details {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        .hotel {
+            width: 90%;
+            max-width: 900px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            color: #000;
+            text-align: left;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+        }
+
+        .hotel img {
+            width: 250px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-right: 20px;
+        }
+
+        .hotel h3 {
+            color: rgb(80, 47, 47);
+            font-size: 2rem;
+        }
+
+        .cancel-btn {
+            background-color:rgb(90, 115, 203);
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            width: 60%;
+            max-width: 250px;
+            margin: 20px auto;
+            transition: 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background-color: #d62828;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container text-center">
+        <h1 class="title">Cancel Your Package Booking?</h1>
+    </div>
+    <br><br><br><br><br><br>
+    <div class="cancel-container">
+        <div class="ticket">
+            <h3>{{ booking.flight.company }} - <span class="text-primary">{{ booking.flight.flight_num }}</span></h3>
+            <div class="ticket-details">
+                <p><strong>Seats:</strong> {{ booking.seat }}</p>
+                <p><strong>FROM:</strong> {{ booking.flight.source }} &nbsp; | &nbsp; <strong>TO:</strong> {{ booking.flight.destination }}</p>
+                <p><strong>DEPARTURE:</strong> {{ booking.flight.dept_time }} &nbsp; | &nbsp; <strong>ARRIVAL:</strong> {{ booking.flight.dest_time }}</p>
+                <p><strong>Seat Class:</strong> {{ booking.seat_class|title }}</p>
+                {% comment %} <p><strong>Price:</strong> ₹{{ price }}</p> {% endcomment %}
+            </div>
+        </div>
+
+        <div class="hotel">
+            <img src="/media/{{ booking.hotel_name.image1 }}" alt="Hotel Image">
+            <div>
+                <h3>{{ booking.hotel_name.hotel_name }}</h3>
+                <div class="hotel-details">
+                    <p><strong>Rooms Booked:</strong> {{ booking.room }}</p>
+                    <p><strong>Address:</strong> {{ booking.hotel_name.hotel_address }}</p>
+                    <p><strong>Distance from Airport:</strong> {{ booking.hotel_name.distfromap }} KM</p>
+                    
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" action="{% url 'cancel_package' booking.id %}">
+            {% csrf_token %}
+            <button type="submit" class="cancel-btn" onclick="return confirmCancel();">Confirm Cancellation</button>
+            {% comment %} <a href="{% url 'dashboard' %}" class="btn btn-secondary">Go Back</a> {% endcomment %}
+        </form>
+    </div>
+
+    <script>
+        function confirmCancel() {
+            return confirm("Are you sure you want to cancel this booking?");
+        }
+    </script>
+</body>
+</html>
+{% endblock %}

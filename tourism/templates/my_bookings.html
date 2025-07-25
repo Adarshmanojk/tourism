@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            margin-top: 40px;
+        }
+        .booking-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .booking-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .booking-details {
+            font-size: 14px;
+            color: #555;
+        }
+        .booking-status {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .no-bookings {
+            text-align: center;
+            font-size: 16px;
+            color: #6c757d;
+        }
+        .back-link {
+            margin-top: 30px;
+            display: inline-block;
+            font-size: 16px;
+        }
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="text-center">My Bookings</h2>
+
+    {% if bookings %}
+        <div class="row">
+            {% for booking in bookings %}
+                <div class="col-md-4">
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            {{ booking.package.title }}
+                        </div>
+                        <div class="booking-details">
+                            <p><strong>Booking Date:</strong> {{ booking.booking_date|date:"Y-m-d H:i" }}</p>
+                            <p><strong>Status:</strong> <span class="booking-status">{{ booking.status }}</span></p>
+                            <p><strong>Number of People:</strong> {{ booking.number_of_people }}</p>
+                            <p><strong>Total Price:</strong> ${{ booking.total_price }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-bookings">You have no bookings yet.</p>
+    {% endif %}
+
+    <div class="back-link text-center">
+        <a href="{% url 'home' %}">Back to Home</a>
+    </div>
+</div>
+
+<!-- Bootstrap and Custom JavaScript -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Optional: Smooth scrolling for anchor links
+    document.querySelector('.back-link a').addEventListener('click', function(e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+</script>
+
+</body>
+</html>

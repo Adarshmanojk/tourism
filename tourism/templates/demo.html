@@ -1,0 +1,114 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+        background-image: url('{% static "img/flight.jpg" %}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        font-family: 'Fredoka One', cursive;
+        color: #fff;
+    }
+
+    .container {
+        text-align: center;
+        margin-top: 50px;
+    }
+
+    .card {
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 25px;
+        max-width: 600px;
+        margin: auto;
+        color: #000;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .card h2 {
+        font-family: 'Fredoka One', cursive;
+        color: #c9302c;
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .details p {
+        font-size: 1.2rem;
+    }
+
+    .btn-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        font-size: 1.2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        width: 45%;
+        text-align: center;
+        transition: 0.3s ease;
+    }
+
+    .btn-cancel {
+        background-color: #d9534f;
+        color: white;
+        display: block; /* Makes the button a block element */
+        margin: 0 auto; /* Centers the button horizontally */
+        text-align: center;
+        padding: 12px 20px;
+        font-size: 1.2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        width: fit-content; /* Adjusts the width to fit the content */
+    }
+    
+
+    .btn-cancel:hover {
+        background-color: #c9302c;
+        transform: scale(1.05);
+    }
+
+    .btn-back {
+        background-color: #337ab7;
+        color: white;
+    }
+
+    .btn-back:hover {
+        background-color: #286090;
+        transform: scale(1.05);
+    }
+</style>
+
+<div class="container">
+    <div class="card">
+        <h2>Confirm Flight Cancellation</h2>
+        <div class="details">
+            <p><strong>Flight:</strong> {{ booking.flight }}</p>
+            <p><strong>Seat:</strong> {{ booking.seat }}</p>
+            <p><strong>Class:</strong> {{ booking.seat_class|title }}</p>
+            <p><strong>Date:</strong> {{ booking.date }}</p>
+            {% comment %} <p><strong>Price:</strong> ₹{{ booking.total_price }}</p> {% endcomment %}
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="btn-container">
+                <button type="submit" class="btn btn-cancel">Confirm Cancellation</button>
+                <a href="{% url 'dashboard' %}" class="btn btn-back">Back to Dashboard</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+

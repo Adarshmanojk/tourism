@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <title>Book Package</title>
+
+  <!-- Bootstrap & Google Fonts -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Spicy+Rice&display=swap" rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <style>
+    body {
+      background-image: url('{% static "img/tour3.jpg" %}');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      font-family: 'Fredoka One', cursive;
+      color: #fff;
+    }
+
+    h1.tr, h1.t {
+      font-family: 'Spicy Rice', cursive;
+      text-align: center;
+      margin: 50px 0 20px;
+      font-size: 3rem;
+    }
+
+    .form {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+    }
+
+    .ticket {
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 20px;
+      color: #000;
+    }
+
+    .ticket h3, .ticket h4 {
+      font-family: 'Fredoka One', cursive;
+      margin: 0 10px;
+      color: #0066cc;
+    }
+
+    .ticket .row {
+      margin-bottom: 10px;
+    }
+
+    .ticket p {
+      margin: 0 15px;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .eprice {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .h-img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .hotel {
+      margin-bottom: 30px;
+    }
+
+    .hotel .row {
+      background: rgba(255, 255, 255, 0.95);
+      color: #000;
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    .h-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #0066cc;
+    }
+
+    .h-add {
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .h-price {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #28a745;
+    }
+
+    .h-pricex {
+      font-size: 0.95rem;
+      color: #666;
+    }
+
+    .h-am {
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .h-rate {
+      font-size: 1.2rem;
+      color: #ffc107;
+    }
+
+    a.btn-primary {
+      display: block;
+      width: fit-content;
+      margin: 40px auto;
+      font-size: 1.2rem;
+      padding: 10px 30px;
+    }
+
+    form input, form select {
+      font-size: 1rem;
+    }
+
+    .main {
+      padding: 40px 0;
+    }
+
+    .shadow-lg {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+  </style>
+</head>
+<body>
+  {% block content %}
+
+  <div class="container mt-5">
+    <h1 class="tr">PACKAGES</h1>
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <form class="form shadow-lg" action="" method="POST" id="packageForm">
+          {% csrf_token %}
+          {{ form.as_p }}
+          
+          <!-- Add Seat Class Dropdown -->
+          {% comment %} <div class="form-group">
+            <label for="seat_class">Seat Class</label>
+            <select class="form-control" id="seat_class" name="seat_class">
+              <option value="economy">Economy</option>
+              <option value="business">Business</option>
+            </select>
+          </div> {% endcomment %}
+
+          <div class="text-center">
+            <button class="btn btn-primary">SEARCH</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <h1 class="t">FLIGHTS</h1>
+    <div class="main">
+      {% for i in Flights %}
+      <div class="container mb-4">
+        <div class="ticket shadow-lg">
+          <div class="row align-items-center">
+            <div class="col-md-4 d-flex align-items-center">
+              <h3>{{ i.company }}</h3>
+              <h4>- {{ i.flight_num }}</h4>
+            </div>
+          </div>
+          <div class="row text-center mt-3">
+            <div class="col-md-2"><p><strong>FROM:</strong><br>{{ i.source }}</p></div>
+            <div class="col-md-2"><p><strong>TO:</strong><br>{{ i.destination }}</p></div>
+            <div class="col-md-2"><p><strong>DEPT TIME:</strong><br>{{ i.dept_time }}</p></div>
+            <div class="col-md-2"><p><strong>DEST TIME:</strong><br>{{ i.dest_time }}</p></div>
+            <div class="col-md-2"><p><strong>Economy Price:</strong> ₹{{ i.eprice }} (Seats: {{ i.economy_seats }})</p></div>
+            <div class="col-md-2"><p><strong>Business Price:</strong> ₹{{ i.bprice }} (Seats: {{ i.business_seats }})</p></div>
+            {% comment %} {% if i.seats > 0 and i.eprice > 0 %}
+            <div class="col-md-2">
+              <p><strong>PRICE:</strong><br>₹{{ i.eprice }}</p>
+            </div>
+            {% else %}
+            <div class="col-md-2">
+              <p><strong>Not Available</strong></p>
+            </div>
+            {% endif %} {% endcomment %}
+          </div>
+        </div>
+      </div>
+      {% empty %}
+        <div class="text-center text-white">
+        </div>
+      {% endfor %}
+    </div>
+
+    <h1 class="t">HOTELS</h1>
+    {% for j in Hotels %}
+    <div class="hotel container">
+      <div class="row shadow-lg">
+        <div class="col-md-4">
+          <img class="h-img" src="/media/{{ j.image1 }}" alt="Hotel image">
+        </div>
+        <div class="col-md-8">
+          <p class="h-name">{{ j.hotel_name }}</p>
+          <p class="h-add">{{ j.hotel_address }}<br>{{ j.distfromap }} KM from nearest airport.</p>
+          <p class="h-price">₹{{ j.hotel_price }}<span class="h-pricex"> /night</span></p>
+          <p class="h-am">{{ j.amenities }}</p>
+          <div class="h-rate">
+            {% with ''|center:j.hotel_rating as range %}
+              {% for _ in range %}
+                ★
+              {% endfor %}
+            {% endwith %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+  {% if Flights or Hotels %}
+  <a href="/bookpackage/{{ source }}/{{ city }}/{{ date }}" class="btn btn-primary p-10">Book Package</a><br><br><br>
+  {% endif %}
+
+  {% endblock %}
+
+  <!-- JS: Date Validation -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var dateField = document.querySelector("input[name='date']");
+      if (dateField) {
+        var today = new Date().toISOString().split('T')[0];
+        dateField.setAttribute("min", today);
+
+        document.getElementById("packageForm").addEventListener("submit", function (event) {
+          var selectedDate = new Date(dateField.value);
+          var currentDate = new Date();
+          currentDate.setHours(0, 0, 0, 0);
+
+          if (selectedDate < currentDate) {
+            alert("Date cannot be in the past. Please select a valid date.");
+            event.preventDefault();
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+
+

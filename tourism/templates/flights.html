@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <title>Search Flights</title>
+    <!-- Bootstrap & Google Fonts -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Spicy+Rice&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-image: url('{% static "img/flight.jpg" %}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            font-family: 'Fredoka One', cursive;
+            color: #fff;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .flight-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            color: #000;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: space-between;
+            height: auto;
+        }
+
+        .flight-card .details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .flight-card h3 {
+            font-family: 'Fredoka One', cursive;
+            color: #0066cc;
+        }
+
+        .btn-primary {
+            font-size: 1.1rem;
+            padding: 8px 20px;
+        }
+    </style>
+</head>
+<body>
+    {% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center">SEARCH FLIGHTS</h1>
+        <div class="form-container shadow-lg">
+            <form action="" method="POST" id="flightForm">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary btn-block">SEARCH</button>
+            </form>
+        </div>
+        <div class="mt-4">
+            {% for i in Flights %}
+            <div class="flight-card shadow-lg">
+                <h3>{{ i.company }} - <span class="text-primary">{{ i.flight_num }}</span></h3>
+                <div class="details">
+                    <p><strong>FROM:</strong> {{ i.source }}</p>
+                    <p><strong>TO:</strong> {{ i.destination }}</p>
+                    <p><strong>DEPT TIME:</strong> {{ i.dept_time }}</p>
+                    <p><strong>DEST TIME:</strong> {{ i.dest_time }}</p>
+                    <p><strong>Economy Price:</strong> ₹{{ i.eprice }} (Seats: {{ i.economy_seats }})</p>
+                    <p><strong>Business Price:</strong> ₹{{ i.bprice }} (Seats: {{ i.business_seats }})</p>
+                </div>
+                <div>
+                    <a href='/bookflight/{{ i.flight_num }}/{{ date }}/economy' class="btn btn-success">BOOK ECONOMY</a>
+                    <a href='/bookflight/{{ i.flight_num }}/{{ date }}/business' class="btn btn-warning">BOOK BUSINESS</a>
+                    {% comment %} <a href='/bookflight/{{ i.flight_num }}/{{ date }}' class="btn btn-success">BOOK</a> {% endcomment %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endblock %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var dateField = document.querySelector("input[name='date']");
+            if (dateField) {
+                var today = new Date().toISOString().split('T')[0];
+                dateField.setAttribute("min", today);
+
+                document.getElementById("flightForm").addEventListener("submit", function (event) {
+                    var selectedDate = new Date(dateField.value);
+                    var currentDate = new Date();
+                    currentDate.setHours(0, 0, 0, 0);
+
+                    if (selectedDate < currentDate) {
+                        alert("Date cannot be in the past. Please select a valid date.");
+                        event.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
